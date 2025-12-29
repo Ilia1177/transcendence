@@ -5,6 +5,7 @@
 export const GATEWAY_CONFIG = {
   // Routes publiques : pas de vérification JWT requise
   PUBLIC_ROUTES: [
+    '/api/hazardous',
     '/api/auth/login',
     '/api/auth/register',
     '/api/auth/2fa/verify',
@@ -29,7 +30,7 @@ export const GATEWAY_CONFIG = {
     GAME: 'http://game-service:3003',
     BLOCK: 'http://blockchain-service:3002',
   },
-} as const
+} as const;
 
 /**
  * Codes d'erreur standardisés pour la gateway
@@ -53,7 +54,7 @@ export const ERROR_CODES = {
   // Generic
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
   NOT_FOUND: 'NOT_FOUND',
-} as const
+} as const;
 
 /**
  * Messages d'erreur standardisés
@@ -70,4 +71,4 @@ export const ERROR_MESSAGES = {
   [ERROR_CODES.NETWORK_ERROR]: 'Network error',
   [ERROR_CODES.INTERNAL_SERVER_ERROR]: 'Internal server error',
   [ERROR_CODES.NOT_FOUND]: 'Resource not found',
-} as const
+} as const;

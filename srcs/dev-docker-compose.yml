@@ -7,6 +7,26 @@ x-healthcheck-template: &healthcheck-template
   start_period: 10s
 
 services:
+
+  hazardous:
+    build:
+      context: ./hazardous
+      dockerfile: Dockerfile.dev
+    container_name: "hazardous-service"
+    volumes:
+      - ./game/src:/app/src
+    expose:
+      - "3017"
+    env_file:
+      - path: ./.env
+      - path: ./.env.hazardous
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      nginx-proxy:
+        condition: service_started
+
   # Development nginx with hot reload
   nginx-proxy:
     build:

@@ -7,12 +7,8 @@ ifeq ($(OS),Darwin)
 	else \
 		echo "Colima is running, checking mounts..."; \
 		if ! colima status 2>/dev/null | grep -q "$(PROJECT_PATH)"; then \
-			echo "Mount missing, restarting Colima with correct mount..."; \
-			colima stop; \
-			colima start --mount "$(PROJECT_PATH):w" --vm-type vz; \
-		else \
-			echo "Mount already configured: $(PROJECT_PATH)"; \
-		fi; \
+			echo "Mount missing, restarting Colima with mount $(PROJECT_PATH)"; \
+		fi;\
 	fi
 else
 	@echo "Skipping Colima start: OS is '$(OS)' (Not Darwin)"
@@ -23,3 +19,4 @@ colima:
 ifeq ($(OS), Darwin)
 	colima start --mount $(VOLUMES_PATH):w --vm-type vz
 endif
+
