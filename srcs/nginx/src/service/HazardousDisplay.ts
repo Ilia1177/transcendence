@@ -18,6 +18,7 @@ export class HazardousDisplay {
     this.main.appendChild(this.terminal);
     this.screen.appendChild(this.main);
     document.body.appendChild(this.screen);
+    this.setupEvenListener();
   }
 
   async accesHazardousCollective(): Promise<void> {
@@ -37,7 +38,69 @@ export class HazardousDisplay {
       throw error; // Re-throw so display() knows it failed
     }
   }
+private addCharacterHoverEffect(element: HTMLPreElement): void {
+  const text = element.textContent || '';
+  element.innerHTML = '';
+  
+  // Wrap each character in a span for individual hover effects
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charAt(i);
+    
+    if (char === '\n') {
+      element.appendChild(document.createTextNode('\n'));
+    } else if (char === ' ') {
+      element.appendChild(document.createTextNode(' '));
+    } else {
+      const span = document.createElement('span');
+      span.className = 'char-hover';
+      span.textContent = char;
+      element.appendChild(span);
+    }
+  }
+}
+private addCursorAnimation(): void {
+  if (document.getElementById('cursor-blink-style')) return;
 
+  const style = document.createElement('style');
+  style.id = 'cursor-blink-style';
+  style.textContent = `
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    
+    @keyframes glitch {
+      0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        text-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+      }
+      25% { 
+        transform: translate(-2px, 2px) scale(1.1);
+        text-shadow: -2px 0 10px rgba(34, 197, 94, 1), 2px 0 10px rgba(255, 0, 0, 0.5);
+      }
+      50% { 
+        transform: translate(2px, -2px) scale(1.15);
+        text-shadow: 2px 0 10px rgba(34, 197, 94, 1), -2px 0 10px rgba(0, 255, 255, 0.5);
+      }
+      75% { 
+        transform: translate(-1px, 1px) scale(1.1);
+        text-shadow: 0 0 15px rgba(34, 197, 94, 1);
+      }
+    }
+    
+    .char-hover {
+      display: inline-block;
+      transition: all 0.1s ease;
+    }
+    
+    .char-hover:hover {
+      animation: glitch 0.3s ease-in-out;
+      color: #4ade80;
+      cursor: pointer;
+    }
+  `;
+  document.head.appendChild(style);
+}
   async drawWelcomeScreen(): Promise<void> {
     console.log('draw terminal');
     // Clear any existing content
@@ -53,9 +116,10 @@ export class HazardousDisplay {
     this.main.appendChild(this.terminal);
     // Start typing animation
     await this.typeText(character, this.getWelcomeAsciiArt(), 2);
+    this.addCharacterHoverEffect(character)
 
     // Add cursor at the end
-    character.appendChild(cursor);
+    // character.appendChild(cursor);
     // Add CSS animation for cursor blink
     this.addCursorAnimation();
     // Add command prompt
@@ -87,21 +151,6 @@ export class HazardousDisplay {
     });
   }
 
-  private addCursorAnimation(): void {
-    // Check if style already exists
-    if (document.getElementById('cursor-blink-style')) return;
-
-    const style = document.createElement('style');
-    style.id = 'cursor-blink-style';
-    style.textContent = `
-      @keyframes blink {
-        0%, 49% { opacity: 1; }
-        50%, 100% { opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
   private getWelcomeAsciiArt(): string {
     console.log(this.main);
     return `
@@ -123,7 +172,6 @@ export class HazardousDisplay {
                                         █─▄▄▄─█─▄▄─█▄─▄███▄─▄███▄─▄▄─█─▄▄▄─█─▄─▄─█▄─▄█▄─█─▄█▄─▄▄─█
                                         █─███▀█─██─██─██▀██─██▀██─▄█▀█─███▀███─████─███▄▀▄███─▄█▀█
                                         ▀▄▄▄▄▄▀▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▀▄▄▄▀▀▄▄▄▀▀▀▄▀▀▀▄▄▄▄▄▀
-    Press any key to continue...
     `;
   }
 
@@ -247,5 +295,10 @@ export class HazardousDisplay {
       line.textContent += text.charAt(i);
       await new Promise((resolve) => setTimeout(resolve, 20));
     }
+  }
+
+  private setupEvenListener() {
+    this.terminal.addEventListener('click', async () => this.accesHazardousCollective)
+    this.accesHazardousCollective();
   }
 }

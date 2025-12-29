@@ -1,12 +1,9 @@
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
-
+import { hazardousRoutes } from './routes/hzd.routes.js'
 const fastify = Fastify({ logger: true });
 
-// Register WebSocket support
-await fastify.register();
-
 // WebSocket game endpoint
-fastify.register(gameRoutes);
+fastify.register(hazardousRoutes);
 
 // 404 handler
 fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
@@ -35,8 +32,5 @@ start();
 // Cleanup on shutdown
 process.on('SIGTERM', () => {
   console.log('Shutting down game service...');
-  gameSessions.forEach((session: any) => session.game.stop());
-  gameSessions.forEach((session: any) => session.players.clear());
-  gameSessions.clear();
   process.exit(0);
 });
