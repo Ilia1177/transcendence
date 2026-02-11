@@ -10,29 +10,31 @@ interface HaloProps {
   size?: number;
   onToggleForm: () => void; // Add this line
 }
-
-const Halo = ({ className = '', size = 120, isRegister, onToggleForm }: HaloProps) => {
+const Halo = ({ className = '', size = 80, isRegister, onToggleForm }: HaloProps) => {
   const [isHovered, setIsHovered] = useState(false);
-
   const { t } = useTranslation();
   const title = isRegister ? t('auth.signup') : t('auth.login');
+
   return (
     <div
-      className={`relative ${className}`}
+      className={`absolute ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Circle size={50} className="cursor-pointer">
-        {!isHovered ? (
-          <span className="text-2xl font-bold">PLAY</span>
-        ) : isRegister ? (
-          <RegisterForm onToggleForm={onToggleForm} />
-        ) : (
-          <LoginForm onToggleForm={onToggleForm} />
-        )}
+      <Circle size={isHovered ? size : 30} className="cursor-pointer p-8">
+        {/* PLAY text */}
+        <span className={`text-2xl font-bold ${isHovered ? 'hidden' : 'block'}`}>PLAY</span>
+
+        {/* Forms */}
+        <div className={`min-h-[100px] ${isHovered ? 'block' : 'hidden'}`}>
+          {isRegister ? (
+            <RegisterForm onToggleForm={onToggleForm} />
+          ) : (
+            <LoginForm onToggleForm={onToggleForm} />
+          )}
+        </div>
       </Circle>
     </div>
   );
 };
-
 export default Halo;
