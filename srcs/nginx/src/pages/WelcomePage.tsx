@@ -52,7 +52,7 @@ export const WelcomePage = () => {
                 <CircleButton>{ai}</CircleButton>
               </Link>
 
-              <Link to="/game/simple-game">
+              <Link to="/simple-game">
                 <CircleButton>{friends}</CircleButton>
               </Link>
 

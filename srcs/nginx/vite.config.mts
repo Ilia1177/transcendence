@@ -17,6 +17,7 @@ export default {
         target: NGINX_HTTPS_URL,
         secure: false,
         changeOrigin: true,
+        ws: true,
       },
       '/uploads': {
         target: NGINX_HTTPS_URL,

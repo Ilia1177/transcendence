@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useGameWebSocket } from '../hooks/GameWebSocket';
 
 interface GameSessionData {
   status: string;
@@ -7,12 +8,14 @@ interface GameSessionData {
   wsUrl: string;
 }
 
-export const useGameSession = () => {
+export const useLocalSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createGameSession = async (): Promise<string | null> => {
+  const { openWebSocket } = useGameWebSocket();
+
+  const createLocalSession = useCallback(async (): Promise<string | null> => {
     if (sessionId) return sessionId; // Already have a session
 
     setIsLoading(true);
@@ -31,7 +34,8 @@ export const useGameSession = () => {
         console.log('Created game session:', data.sessionId);
         console.log('game session result:', data);
 
-        // You'll handle WebSocket separately
+        await openWebSocket(data.sessionId);
+
         return data.sessionId;
       } else {
         throw new Error(data.message || 'Failed to create game session');
@@ -44,18 +48,11 @@ export const useGameSession = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const clearSession = () => {
-    setSessionId(null);
-    setError(null);
-  };
-
+  }, [sessionId, openWebSocket]);
   return {
     sessionId,
     isLoading,
     error,
-    createGameSession,
-    clearSession,
+    createLocalSession,
   };
 };

@@ -4,6 +4,7 @@ import { LoginPage } from './pages/LoginRegisterPage';
 import { useAuth } from './providers/AuthProvider';
 import { AnimationPage } from './pages/AnimationPage';
 import { WelcomePage } from './pages/WelcomePage';
+import { GamePage } from './pages/GamePage';
 
 const GuestRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoggedIn } = useAuth();
@@ -36,6 +37,7 @@ export const App = () => {
             </GuestRoute>
           }
         /> */}
+        <Route path="/simple-game" element={<GamePage />}></Route>
         <Route path="/me" element={<MeRedirect />}></Route>
         <Route path="/profile/:username" element={<ProfilePage />}></Route>
       </Routes>
