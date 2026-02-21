@@ -8,26 +8,77 @@ import { useGameState } from '../hooks/GameState';
 import { useGameWebSocket } from '../hooks/GameWebSocket';
 import { useEffect } from 'react';
 
+export interface Paddle {
+  y: number;
+  height: number;
+  width: number;
+  speed: number;
+  moving: 'up' | 'down' | 'stop';
+}
+
+export interface Paddles {
+  left: Paddle;
+  right: Paddle;
+}
+
+export interface Scores {
+  left: number;
+  right: number;
+}
+
+export type GameStatus = 'waiting' | 'playing' | 'paused' | 'finished';
+
+export interface GameState {
+  ball: {
+    x: number;
+    y: number;
+    radius: number;
+  };
+  paddles: {
+    left: {
+      y: number;
+      height: number;
+    };
+    right: {
+      y: number;
+      height: number;
+    };
+  };
+  scores: Scores;
+  status: GameStatus;
+  cosmicBackground: number[][] | null;
+}
 const colors = {
   start: '#00ff9f',
   end: '#0088ff',
 };
 
-export const GamePage = ({ sessionId }: { sessionId: string }) => {
-  const { createLocalSession, isLoading } = useLocalSession();
+export const GamePage = ({ sessionId: routeSessionId }: { sessionId: string | null }) => {
+  const { createLocalSession, isLoading, sessionId: localSessionId } = useLocalSession();
   const { gameStateRef, updateGameState } = useGameState();
   const { openWebSocket } = useGameWebSocket();
+
+  const activeSessionId = routeSessionId || localSessionId;
+  console.log('GamePage render - activeSessionId:', activeSessionId); // Add this
   // Connect WebSocket when sessionId is available
   useEffect(() => {
-    if (!sessionId) return;
+    if (!activeSessionId) {
+      console.log('No Active session...');
+      return;
+    }
 
-    openWebSocket(sessionId).then((ws) => {
+    console.log('Opening WebSocket for session:', activeSessionId);
+
+    openWebSocket(activeSessionId).then((ws) => {
+      console.log('WebSocket opened:', ws);
       ws.onmessage = (event) => {
+        console.log('Received WebSocket message:', event.data);
         const state: GameState = JSON.parse(event.data);
+        console.log('Parsed game state:', state);
         updateGameState(state); // update ref, no React re-render
       };
     });
-  }, [sessionId, openWebSocket, updateGameState]);
+  }, [activeSessionId, openWebSocket, updateGameState]);
   return (
     <div className={`w-full h-full relative`}>
       <Background

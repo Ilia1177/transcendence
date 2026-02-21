@@ -12,8 +12,13 @@ const GameControl = ({
   return (
     <div className={`flex gap-4 ${className}`}>
       <button
+        style={{ border: '3px solid red' }}
         id="create-game-btn"
-        onClick={onCreateLocalGame}
+        // onClick={onCreateLocalGame}
+        onClick={() => {
+          console.log('Button clicked!');
+          onCreateLocalGame();
+        }}
         disabled={loading}
         className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition"
       >

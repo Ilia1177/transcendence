@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { useGameState } from '../hooks/useGameState';
+import { useGameState } from '../../hooks/GameState';
 
 export interface Scores {
   left: number;
@@ -54,9 +54,15 @@ const Arena = ({ className = '', gameStateRef }: ArenaProps) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('No canvas ref');
+      return;
+    }
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.log('No canvas context');
+      return;
+    }
 
     const render = () => {
       const gameState = gameStateRef.current;

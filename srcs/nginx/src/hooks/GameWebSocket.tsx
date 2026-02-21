@@ -36,10 +36,11 @@ export const useGameWebSocket = () => {
   }, [stopPingInterval]);
 
   const openWebSocket = useCallback(
-    (sessionId: string): Promise<void> => {
+    (sessionId: string): Promise<WebSocket> => {
       // Prevent duplicate connections
       if (websocketRef.current?.readyState === WebSocket.OPEN) {
-        return Promise.resolve();
+        console.log('⚠️ WebSocket already open, returning existing connection');
+        return Promise.resolve(websocketRef.current);
       }
 
       // Close existing socket if any
@@ -50,6 +51,7 @@ export const useGameWebSocket = () => {
 
         // const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         // const wsUrl = `${protocol}//${window.location.host}/api/game/${sessionId}`;
+        // const wsUrl = `${window.location.origin.replace(/^https/, 'wss')}/api/game/${sessionId}`;
         const wsUrl = `${window.location.origin.replace(/^https/, 'wss')}/api/game/${sessionId}`;
 
         const ws = new WebSocket(wsUrl);
@@ -71,7 +73,7 @@ export const useGameWebSocket = () => {
           setConnected(true);
           setError(null);
           startPingInterval();
-          resolve();
+          resolve(ws);
         };
 
         ws.onmessage = (event) => {

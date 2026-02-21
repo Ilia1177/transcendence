@@ -37,7 +37,7 @@ export const App = () => {
             </GuestRoute>
           }
         /> */}
-        <Route path="/simple-game" element={<GamePage />}></Route>
+        <Route path="/simple-game" element={<GamePage sessionId={null} />}></Route>
         <Route path="/me" element={<MeRedirect />}></Route>
         <Route path="/profile/:username" element={<ProfilePage />}></Route>
       </Routes>

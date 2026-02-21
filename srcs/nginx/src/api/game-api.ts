@@ -34,7 +34,7 @@ export const useLocalSession = () => {
         console.log('Created game session:', data.sessionId);
         console.log('game session result:', data);
 
-        await openWebSocket(data.sessionId);
+        // await openWebSocket(data.sessionId);
 
         return data.sessionId;
       } else {
