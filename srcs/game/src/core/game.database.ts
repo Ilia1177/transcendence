@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS player (
     id INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
     avatar TEXT,-- NULL if not synchronised with user service
-    updated_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_match_tournament

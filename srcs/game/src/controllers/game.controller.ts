@@ -111,6 +111,7 @@ export async function newGameSession(this: FastifyInstance, req: FastifyRequest)
       wsUrl: `/game/ws/${sessionId}`,
     };
   }
+  console.log('User ID: ', userId);
   // const tournamentId = (this as any).tournamentId || null;
   // let sessionId = db.getSessionGame(tournamentId, userId);
   if (sessionData.game) sessionData.game.preview();
