@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
+import { api } from '../api/api-client';
 export interface GameSession {
   sessionId: string;
   createdAt?: string;
@@ -25,16 +25,16 @@ export const useGameSessions = (autoFetch = true): UseGameSessionsReturn => {
     setError(null);
 
     try {
-      const response = await fetch('/api/game/sessions', {
-        method: 'GET',
-        credentials: 'include',
-      });
+      // const response = await fetch('/api/game/sessions', {
+      //   method: 'GET',
+      //   credentials: 'include',
+      // });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch sessions: ${response.statusText}`);
-      }
+      const response = await api.get('/game/sessions');
 
-      const data = await response.json();
+      const data = response.data;
+
+      // const data = await response.json();
       console.log('Backend response:', data);
 
       // Extract the sessions array from the response
@@ -54,36 +54,6 @@ export const useGameSessions = (autoFetch = true): UseGameSessionsReturn => {
     }
   }, []);
 
-  // const fetchSessions = useCallback(async () => {
-  //   setIsLoadingSessions(true);
-  //   setError(null);
-  //
-  //   try {
-  //     const response = await fetch('/api/game/sessions', {
-  //       method: 'GET',
-  //       credentials: 'include',
-  //     });
-  //
-  //     if (!response.ok) {
-  //       throw new Error(`Failed to fetch sessions: ${response.statusText}`);
-  //     }
-  //
-  //     const data = await response.json();
-  //
-  //     // Adjust based on your backend response structure
-  //     // If backend returns { sessions: [...] }
-  //     setSessionsList(data.sessionsList || data);
-  //
-  //   } catch (err) {
-  //     const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sessions';
-  //     console.error('Error fetching sessions:', err);
-  //     setError(errorMessage);
-  //     setSessionsList([]);
-  //   } finally {
-  //     setIsLoadingSessions(false);
-  //   }
-  // }, []);
-  //
   // Auto-fetch on mount if enabled
   useEffect(() => {
     if (autoFetch) {

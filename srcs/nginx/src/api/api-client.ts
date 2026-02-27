@@ -45,5 +45,13 @@ api.interceptors.response.use(
     return Promise.reject(frontendError);
   },
 );
-
+// Debug HEADER user-id
+api.interceptors.request.use(
+  (config) => {
+    console.log('Request headers:', config.headers);
+    console.log('With credentials:', config.withCredentials);
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 export default api;

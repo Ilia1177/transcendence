@@ -10,6 +10,16 @@ import { useKeyboardControls } from '../hooks/input.tsx';
 import { useGameSessions, UseGameSessionsReturn } from '../hooks/GameSessions';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import { api } from '../api/api-client';
+// import authProvider from '../providers/AuthProvider'
+import {
+  ERROR_CODES,
+  ErrorCode,
+  ErrorDetail,
+  FrontendError,
+  HTTP_STATUS,
+  HttpStatus,
+} from '@transcendence/core';
 
 export interface Paddle {
   y: number;
@@ -68,7 +78,10 @@ interface GamePageProps {
   sessionId: string | null;
   gameMode: 'local' | 'remote' | 'tournament';
 }
-
+interface CreateSessionPayload {
+  gameMode: string;
+  tournamentId?: number;
+}
 // export const GamePage = ({ sessionId: routeSessionId }: { sessionId: string | null }) => {
 export const GamePage = ({ sessionId, gameMode }: GamePageProps) => {
   const { openWebSocket, closeWebSocket } = useGameWebSocket();
@@ -78,7 +91,7 @@ export const GamePage = ({ sessionId, gameMode }: GamePageProps) => {
   const wsRef = useRef<WebSocket | null>(null); // Use ref instead of state
   const { tournamentId } = useParams<{ tournamentId?: string }>();
   const navigate = useNavigate();
-
+  // const { checkAuth, isLoggedIn } = useAuth(); // Get from context
   useKeyboardControls({
     wsRef,
     gameMode,
@@ -87,26 +100,40 @@ export const GamePage = ({ sessionId, gameMode }: GamePageProps) => {
 
   const createLocalSession = async () => {
     setIsLoading(true);
-    console.log('Fetching sessions from backend...');
+    console.log('🍪 Cookies:', document.cookie);
+    console.log('create session with...', gameMode);
     // Build request body conditionally
     const requestBody = {
       gameMode: gameMode,
       ...(tournamentId ? { tournamentId } : {}),
     };
 
-    const res = await fetch('/api/game/create-session', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-    const data = await res.json();
-    if (res.ok && data.sessionId) {
-      console.log('Success');
-      setSessionId(data.sessionId);
+    try {
+      const payload: CreateSessionPayload = {
+        gameMode: gameMode,
+        tournamentId: 43,
+      };
+      console.log('Making request with credentials:', api.defaults.withCredentials);
+      const response = await api.post('/game/create-session', payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      // const response = await api.post('/game/create-session', payload);
+      const data = response.data; // or destructure: const { data } = response;
+
+      if (data && data.sessionId) {
+        console.log('Success');
+        setSessionId(data.sessionId);
+      }
+    } catch (error) {
+      // Your interceptor will transform this to FrontendError
+      console.error('Failed to create session:', error);
+      // Handle error appropriately
+    } finally {
+      setIsLoading(false);
     }
+
     setIsLoading(false);
   };
 
@@ -125,16 +152,22 @@ export const GamePage = ({ sessionId, gameMode }: GamePageProps) => {
       console.log('no Session');
       return;
     }
-    const res = await fetch(`/api/game/del/${currentSessionId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    console.log('EXIIIT');
-    const data = await res.json();
-    if (res.ok && data.message) {
-      console.log(data.message);
+    try {
+      const response = await api.delete(`/game/del/${currentSessionId}`);
+      const data = response.data; // or destructure: const { data } = response;
+      if (data && data.sessionId) {
+        console.log('Success');
+        setSessionId(data.sessionId);
+      }
+    } catch (error) {
+      // Your interceptor will transform this to FrontendError
+      console.error('Failed to create session:', error);
+      // Handle error appropriately
+    } finally {
+      setIsLoading(false);
       navigate('/home');
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
